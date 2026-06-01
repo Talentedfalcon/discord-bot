@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, PermissionFlagsBits, MessageFlags } = require('discord.js');
 
 module.exports={
     data: new SlashCommandBuilder()
@@ -10,8 +10,19 @@ module.exports={
                     .setName('command')
                     .setDescription('The command to reload')
                     .setRequired(true)
-        ),
+        )
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
     async execute(interaction){
+        // console.log(interaction.user.id);
+        // console.log(interaction.member.permissions.has(PermissionFlagsBits.Administrator));
+        if(!interaction.member.permissions.has(PermissionFlagsBits.Administrator) || interaction.user.id!==process.env.AUTHORIZED_USER){
+            console.log(`user: ${interaction.user.username} tried using /reload`);
+            return await interaction.reply({
+                content: 'You do not have permission to use this command!',
+                flags: MessageFlags.Ephemeral
+            })
+        }
+
         const commandName=interaction.options.getString('command',true).toLowerCase();
         const command=interaction.client.commands.get(commandName);
 
