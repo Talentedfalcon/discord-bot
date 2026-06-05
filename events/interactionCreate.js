@@ -3,7 +3,7 @@ const { Events, MessageFlags, Collection } = require('discord.js');
 module.exports={
     name: Events.InteractionCreate,
     async execute(interaction){
-        if(!(interaction.isChatInputCommand() || interaction.isAutocomplete())){
+        if(!(interaction.isChatInputCommand() || interaction.isAutocomplete() || interaction.isContextMenuCommand())){
             return;
         }
         const command = interaction.client.commands.get(interaction.commandName);
@@ -19,7 +19,7 @@ module.exports={
             cooldowns.set(command.data.name, new Collection());
         }
         
-        if(interaction.isChatInputCommand()){
+        if(interaction.isChatInputCommand() || interaction.isUserContextMenuCommand()){
             const now = Date.now();
             const timestamps = cooldowns.get(command.data.name);
             const defaultCooldownDuration = 3;
