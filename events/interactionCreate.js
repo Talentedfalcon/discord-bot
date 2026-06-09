@@ -3,23 +3,18 @@ const { Events, MessageFlags, Collection } = require('discord.js');
 module.exports={
     name: Events.InteractionCreate,
     async execute(interaction){
-        if(!(interaction.isChatInputCommand() || interaction.isAutocomplete() || interaction.isContextMenuCommand())){
-            return;
-        }
-        const command = interaction.client.commands.get(interaction.commandName);
-
-        if(!command){
-            console.error(`No command matching ${interaction.commandName} was found`);
-            return;
-        }
-
-        const { cooldowns } = interaction.client;
-
-        if (!cooldowns.has(command.data.name)) {
-            cooldowns.set(command.data.name, new Collection());
-        }
-        
         if(interaction.isChatInputCommand() || interaction.isUserContextMenuCommand()){
+            const command = interaction.client.commands.get(interaction.commandName);
+            if(!command){
+                console.error(`No command matching ${interaction.commandName} was found`);
+                return;
+            }
+    
+            const { cooldowns } = interaction.client;
+            if (!cooldowns.has(command.data.name)) {
+                cooldowns.set(command.data.name, new Collection());
+            }
+
             const now = Date.now();
             const timestamps = cooldowns.get(command.data.name);
             const defaultCooldownDuration = 3;
@@ -57,12 +52,26 @@ module.exports={
             }
         }
         else if(interaction.isAutocomplete()){
+            const command = interaction.client.commands.get(interaction.commandName);
+            if(!command){
+                console.error(`No command matching ${interaction.commandName} was found`);
+                return;
+            }
+
             try{
                 await command.autocomplete(interaction);
             }
             catch(error){
                 console.error(error);
             }
+        }
+        else if(interaction.isButton()){
+            //temp
+            console.log('Button Interaction');
+        }
+        else if(interaction.isStringSelectMenu()){
+            //temp
+            console.log('Select Menu Interaction');
         }
     },
 };
